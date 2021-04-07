@@ -1,0 +1,22 @@
+{
+  "name": "homehello",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.mjs",
+  "scripts": {
+    "start": "node ./index.mjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "alsa-capture": "^0.2.1",
+    "dsp.js": "^1.0.1",
+    "fft-js": "0.0.12",
+    "fourier-transform": "^1.1.2",
+    "mic": "^2.1.2"
+  },
+  "devDependencies": {
+    "dotenv": "^8.2.0"
+  }
+}
