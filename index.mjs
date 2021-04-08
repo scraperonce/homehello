@@ -61,12 +61,12 @@ instance.on('audio', (data) => {
   if (tick > TARGET_TICK_MAX) {
     console.log('EVALUATION TIMED-OUT');
 
-    if (isScoreQuaolified(scorePing, scorePong, TARGET_SCORE)) {
-      requestToSlack('多分なったと思う');
-      console.log('✨ MAY BE PING-PONG.');
-    } else if (isScoreQuaolified(scorePing, scorePong, TARGET_SCORE_STRICT)) {
+    if (isScoreQuaolified(scorePing, scorePong, TARGET_SCORE_STRICT)) {
       requestToSlack('絶対なったと思う');
       console.log('✨ IT IS PING-PONG!');
+    } else if (isScoreQuaolified(scorePing, scorePong, TARGET_SCORE)) {
+      requestToSlack('多分なったと思う');
+      console.log('✨ MAY BE PING-PONG.');
     } else {
       console.log('😌 NOT PING-PONG.');
     }
