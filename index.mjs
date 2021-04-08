@@ -16,11 +16,12 @@ const TARGET_HZ_PING = 650;
 const TARGET_HZ_PONG = 513;
 const TARGET_PLAY = 50;
 const TARGET_TICK_MAX = 200;
-const TARGET_SCORE = Number.parseInt(TARGET_TICK_MAX * 1 / 3, 10);
-const TARGET_SCORE_STRICT = Number.parseInt(TARGET_TICK_MAX * 1 / 2, 10);
+const TARGET_SCORE = Number.parseInt(TARGET_TICK_MAX * 1 / 8, 10);
+const TARGET_SCORE_STRICT = Number.parseInt(TARGET_TICK_MAX * 1 / 5, 10);
 
 let tick = 0;
-let score = 0;
+let scorePing = 0;
+let scorePong = 0;
 
 const instance = new AlsaCapture({
   device: 'hw:2',
@@ -37,17 +38,22 @@ instance.on('audio', (data) => {
 
   const peak = Math.max(...phasors.slice(CUTOFF_LOW, CUTOFF_HIGH + 1));
   const index = phasors.indexOf(peak);
-  const hz = ("00000" + Number.parseInt(indexToHz(index))).slice(-5);
-  const idx = ("000" + index).slice(-3);
+  const hz = indexToHz(index);
 
-  if (peak > THRESHOLD && (inRange(hz, TARGET_HZ_PING) || inRange(hz, TARGET_HZ_PONG))) {
+  const detectedHz = getDetectedHz(hz);
+
+  if (peak > THRESHOLD && detectedHz) {
     if (tick === 0) {
       tick = 1;
       console.log('EVALUATION START');
       start();
     }
 
-    score++;
+    if (detectedHz === TARGET_HZ_PING) {
+      scorePing++;
+    } else if (detectedHz === TARGET_HZ_PONG) {
+      scorePong++;
+    }
 
     // console.log('DETECTED as ', inRange(hz, TARGET_HZ_PING) ? "PING" : "PONG", ". / score: ", score);
   }
@@ -55,10 +61,10 @@ instance.on('audio', (data) => {
   if (tick > TARGET_TICK_MAX) {
     console.log('EVALUATION TIMED-OUT');
 
-    if (score > TARGET_SCORE) {
+    if (isScoreQuaolified(scorePing, scorePong, TARGET_SCORE)) {
       requestToSlack('多分なったと思う');
       console.log('✨ MAY BE PING-PONG.');
-    } else if (score > TARGET_SCORE_STRICT) {
+    } else if (isScoreQuaolified(scorePing, scorePong, TARGET_SCORE_STRICT)) {
       requestToSlack('絶対なったと思う');
       console.log('✨ IT IS PING-PONG!');
     } else {
@@ -69,26 +75,35 @@ instance.on('audio', (data) => {
   } else if (tick > 0) {
     tick++;
   }
-
-  // lowPong = Math.max(lowPong, phasors[LOW_PING_INDEX]);
-  // highPing = Math.max(highPing, phasors[HIGH_PING_INDEX]);
-  
-  // printProgress(`PEAK: ${LOW_PONG_HZ}Hz: ${lowPong}\t/ ${HIGH_PING_HZ}Hz: ${highPing}`);
 });
 
 console.log('Listening...');
 
 function start() {
   tick = 1;
-  score += 5;
 }
 
 function reset() {
   tick = 0;
-  score = 0;
+  scorePing = 0;
+  scorePong = 0;
 }
 
-function inRange(value, target) {
+function isScoreQuaolified(scorePing, scorePong, TARGET) {
+  return scorePing > TARGET && scorePong > TARGET;
+}
+
+function getDetectedHz(value) {
+  if (inRange(value, TARGET_HZ_PING)) {
+    return TARGET_HZ_PING;
+  } else if (inRange(value, TARGET_HZ_PONG)) {
+    return TARGET_HZ_PONG
+  } else {
+    return false;
+  }
+}
+
+function inRange(value, target = null) {
   return ((target - TARGET_PLAY) < value) && ((target + TARGET_PLAY) > value);
 }
 
