@@ -16,8 +16,8 @@ const TARGET_HZ_PING = 650;
 const TARGET_HZ_PONG = 513;
 const TARGET_PLAY = 50;
 const TARGET_TICK_MAX = 200;
-const TARGET_SCORE = Number.parseInt(TARGET_TICK_MAX * 1 / 8, 10);
-const TARGET_SCORE_STRICT = Number.parseInt(TARGET_TICK_MAX * 1 / 5, 10);
+const TARGET_SCORE = Number.parseInt(TARGET_TICK_MAX * 1 / 4 / 2, 10);
+const TARGET_SCORE_STRICT = Number.parseInt(TARGET_TICK_MAX * 1 / 2 / 2, 10);
 
 let tick = 0;
 let scorePing = 0;
@@ -45,7 +45,7 @@ instance.on('audio', (data) => {
   if (peak > THRESHOLD && detectedHz) {
     if (tick === 0) {
       tick = 1;
-      console.log('EVALUATION START');
+      log('EVALUATION START');
       start();
     }
 
@@ -55,20 +55,20 @@ instance.on('audio', (data) => {
       scorePong++;
     }
 
-    // console.log('DETECTED as ', inRange(hz, TARGET_HZ_PING) ? "PING" : "PONG", ". / score: ", score);
+    // log('DETECTED as ', inRange(hz, TARGET_HZ_PING) ? "PING" : "PONG", ". / score: ", score);
   }
 
   if (tick > TARGET_TICK_MAX) {
-    console.log('EVALUATION TIMED-OUT');
+    log('EVALUATION TIMED-OUT');
 
     if (isScoreQuaolified(scorePing, scorePong, TARGET_SCORE_STRICT)) {
       requestToSlack('絶対なったと思う');
-      console.log('✨ IT IS PING-PONG!');
+      log('✨ IT IS PING-PONG!', `ping: ${scorePing}, pong: ${scorePong}`);
     } else if (isScoreQuaolified(scorePing, scorePong, TARGET_SCORE)) {
       requestToSlack('多分なったと思う');
-      console.log('✨ MAY BE PING-PONG.');
+      log('✨ MAY BE PING-PONG.', `ping: ${scorePing}, pong: ${scorePong}`);
     } else {
-      console.log('😌 NOT PING-PONG.');
+      log('😌 NOT PING-PONG.', `ping: ${scorePing}, pong: ${scorePong}`);
     }
 
     reset();
@@ -77,7 +77,9 @@ instance.on('audio', (data) => {
   }
 });
 
-console.log('Listening...');
+log('Homehello Listening...');
+log(`Frequency Rate: ${RATE} / Window size: ${WINDOW_SIZE}`);
+log(`Target score: ${TARGET_SCORE} / strict: ${TARGET_SCORE_STRICT}`);
 
 function start() {
   tick = 1;
@@ -120,8 +122,7 @@ function convertBlock(incomingData) { // incoming data is a UInt8Array
   return outputData;
 }
 
-function printProgress(progress){
-    process.stdout.clearLine();
-    process.stdout.cursorTo(0);
-    process.stdout.write(`${progress}`);
+function log(...message) {
+  const dt = (new Date()).toISOString();
+  console.log(`[${dt}] ${message.join(' ')}`);
 }
