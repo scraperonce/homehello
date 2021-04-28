@@ -9,7 +9,7 @@ const BASE_OPTIONS = {
   }
 }
 
-export function requestToSlack(value) {
+export function requestToSlack(value: string) {
   const options = {
     ...BASE_OPTIONS,
     path: `/trigger/${process.env.IFTTT_TRIGGER_NAME}/with/key/${process.env.IFTTT_WEBHOOK_TOKEN}`,

@@ -1,6 +1,6 @@
 import ft from 'fourier-transform';
 import AlsaCapture from 'alsa-capture';
-import { requestToSlack } from './request.mjs';
+import { requestToSlack } from './request';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -12,12 +12,13 @@ const CUTOFF_LOW = 8;
 const CUTOFF_HIGH = 20;
 const THRESHOLD = 0.35;
 
-const TARGET_HZ_PING = 650;
-const TARGET_HZ_PONG = 513;
+const TARGET_HZ_PING = 650; // fq of ping
+const TARGET_HZ_PONG = 513; // fq of pong
+
 const TARGET_PLAY = 50;
 const TARGET_TICK_MAX = 200;
-const TARGET_SCORE = Number.parseInt(TARGET_TICK_MAX * 1 / 4 / 2, 10);
-const TARGET_SCORE_STRICT = Number.parseInt(TARGET_TICK_MAX * 1 / 2 / 2, 10);
+const TARGET_SCORE = Math.round(TARGET_TICK_MAX * 1 / 4 / 2);
+const TARGET_SCORE_STRICT = Math.round(TARGET_TICK_MAX * 1 / 2 / 2);
 
 let tick = 0;
 let scorePing = 0;
@@ -91,11 +92,11 @@ function reset() {
   scorePong = 0;
 }
 
-function isScoreQuaolified(scorePing, scorePong, TARGET) {
+function isScoreQuaolified(scorePing: number, scorePong: number, TARGET: number) {
   return scorePing > TARGET && scorePong > TARGET;
 }
 
-function getDetectedHz(value) {
+function getDetectedHz(value: number) {
   if (inRange(value, TARGET_HZ_PING)) {
     return TARGET_HZ_PING;
   } else if (inRange(value, TARGET_HZ_PONG)) {
@@ -105,15 +106,15 @@ function getDetectedHz(value) {
   }
 }
 
-function inRange(value, target = null) {
+function inRange(value: number, target: number) {
   return ((target - TARGET_PLAY) < value) && ((target + TARGET_PLAY) > value);
 }
 
-function indexToHz(index) {
+function indexToHz(index: number) {
   return index * 44100 * 2 / WINDOW_SIZE;
 }
 
-function convertBlock(incomingData) { // incoming data is a UInt8Array
+function convertBlock(incomingData: Uint8Array) { // incoming data is a UInt8Array
   var i, l = incomingData.length;
   var outputData = new Float32Array(incomingData.length);
   for (i = 0; i < l; i++) {
@@ -122,7 +123,7 @@ function convertBlock(incomingData) { // incoming data is a UInt8Array
   return outputData;
 }
 
-function log(...message) {
+function log(...message: string[]) {
   const dt = (new Date()).toISOString();
   console.log(`[${dt}] ${message.join(' ')}`);
 }
