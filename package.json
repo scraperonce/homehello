@@ -1,6 +1,6 @@
 {
   "name": "homehello",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "",
   "main": "index.ts",
   "scripts": {
@@ -15,7 +15,9 @@
     "dsp.js": "^1.0.1",
     "fft-js": "0.0.12",
     "fourier-transform": "^1.1.2",
-    "mic": "^2.1.2"
+    "mic": "^2.1.2",
+    "rxjs": "^7.0.1",
+    "strict-event-emitter-types": "^2.0.0"
   },
   "devDependencies": {
     "@types/node": "^15.0.1",
