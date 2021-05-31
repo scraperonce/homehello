@@ -28,12 +28,14 @@ const ff = floatFormatter();
 // });
 
 audience.on('detect', ({scores}) => {
-  log(`DETECT | ✨ Intercom detected, notification sent.`, `scores: ${scores.map((p, i) => `${options.frequencies[i]}: ${nf(p)}`)}`);
+  const printed = scores.map((p, i) => `${options.frequencies[i]}hz: ${nf(p)}`);
+  log(`DETECT | ✨ Intercom detected, notification sent.`, `scores: ${printed}`);
   requestToSlack(process.env.MESSAGE ?? 'Intercom detected');
 });
 
 // audience.on('abort', ({ scores }) => {
-//   log(`ABORT  | 😌 Detection aborted. (timed-out or too much silence)`, `scores: ${scores.map((p, i) => `${options.frequencies[i]}: ${nf(p)}`)}`);
+//   const printed = scores.map((p, i) => `${options.frequencies[i]}hz: ${nf(p)}`);
+//   log(`ABORT  | 😌 Detection aborted. (timed-out or too much silence)`, `scores: ${printed}`);
 // });
 
 audience.listen();
